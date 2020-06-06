@@ -73,5 +73,14 @@ public class Model {
 			Collections.sort(congiunti);
 			return congiunti;		
 		}
+	//Punto 2 Simulazione
+	public String simula(Food cibo, int k) {
+		Simulator sim = new Simulator(this.grafo,this);
+		sim.setK(k);
+		sim.init(cibo);
+        sim.run();
+      String messaggio = String.format("preparati %d cibi in %f minuti \n", sim.getCibiPreparati(), sim.getTempoPreparazione() );
+	 return messaggio;
+	}
 		
 		}
