@@ -5,8 +5,12 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Food;
+import it.polito.tdp.food.model.FoodAndCongiunte;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +45,7 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -49,13 +53,40 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	Integer porzioni;
+    	
+    	try {
+    		porzioni = Integer.parseInt(this.txtPorzioni.getText());
+    		
+    	}catch (NumberFormatException e) {
+    		txtResult.appendText("Inserisci un numero valido di calorie!");
+    	    return;
+    	}
+    	this.model.creaGrafo(porzioni);
+    	this.boxFood.getItems().clear();
+    	List<Food>  cibi = this.model.getFoods(porzioni);
+    	Collections.sort(cibi);
+    	this.boxFood.getItems().addAll(cibi);
+    	
+    	txtResult.appendText(String.format("Grafo creato con %d vertici e %d archi", this.model.nVertici(), this.model.nArchi()));
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...");
+    	
+    	Food sorgente = this.boxFood.getSelectionModel().getSelectedItem();
+    	if(sorgente == null) {
+    		txtResult.appendText("Errore seleziona un cibo");
+    		return;
+    	}
+    	
+    	List<FoodAndCongiunte> lista = this.model.getCongiunti(sorgente);
+    	for(int i=0; i<5 && i<lista.size(); i++) {
+    		txtResult.appendText(String.format("%s %f  \n", lista.get(i).getF().getDisplay_name(),
+    				                                        lista.get(i).getCalorieCongiunte()));
+    	}
+    	
     }
 
     @FXML
